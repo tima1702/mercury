@@ -1,122 +1,55 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
+import Step1Personal from './pages/Step1Personal'
+import Step2Address from './pages/Step2Address'
+import Step3Loan from './pages/Step3Loan'
+import { useFormState } from './context/FormContext'
+import { step1Schema } from './schemas/step1'
+import { step2Schema } from './schemas/step2'
 
-function App() {
-  const [count, setCount] = useState(0)
+function StepGuard({ allow, children }: { allow: boolean; children: React.ReactNode }) {
+  return allow ? <>{children}</> : <Navigate to="/" replace />
+}
 
+function StepBar() {
+  const { pathname } = useLocation()
+  const idx = pathname === '/step3' ? 2 : pathname === '/step2' ? 1 : 0
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+    <div className="steps">
+      {[0, 1, 2].map((i) => (
+        <div key={i} className={`dot ${i <= idx ? 'active' : ''}`} />
+      ))}
+    </div>
   )
 }
 
-export default App
+export default function App() {
+  const { state } = useFormState()
+  const step1Ok = step1Schema.safeParse(state.step1).success
+  const step2Ok = step1Ok && step2Schema.safeParse(state.step2).success
+
+  return (
+    <div className="app-shell">
+      <StepBar />
+      <Routes>
+        <Route path="/" element={<Step1Personal />} />
+        <Route
+          path="/step2"
+          element={
+            <StepGuard allow={step1Ok}>
+              <Step2Address />
+            </StepGuard>
+          }
+        />
+        <Route
+          path="/step3"
+          element={
+            <StepGuard allow={step2Ok}>
+              <Step3Loan />
+            </StepGuard>
+          }
+        />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </div>
+  )
+}
