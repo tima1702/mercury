@@ -1,0 +1,13 @@
+services:
+  mercury:
+    image: mercury:latest
+    container_name: mercury
+    expose:
+      - "80"
+    networks:
+      - books_default
+    restart: unless-stopped
+
+networks:
+  books_default:
+    external: true
