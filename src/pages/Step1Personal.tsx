@@ -1,14 +1,15 @@
 import { useNavigate } from 'react-router-dom'
 import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useFormState, type Step1Data } from '../context/FormContext'
+import { useFormStore, type Step1Data } from '../store/formStore'
 import { step1Schema, type Step1Form } from '../schemas/step1'
 import PhoneInput from '../components/PhoneInput'
 import { useAutoSave } from '../hooks/useAutoSave'
 
 export default function Step1Personal() {
   const navigate = useNavigate()
-  const { state, setStep1 } = useFormState()
+  const step1 = useFormStore((s) => s.step1)
+  const setStep1 = useFormStore((s) => s.setStep1)
 
   const {
     register,
@@ -19,10 +20,10 @@ export default function Step1Personal() {
   } = useForm<Step1Form>({
     resolver: zodResolver(step1Schema),
     defaultValues: {
-      phone: state.step1.phone,
-      firstName: state.step1.firstName,
-      lastName: state.step1.lastName,
-      gender: state.step1.gender || undefined,
+      phone: step1.phone,
+      firstName: step1.firstName,
+      lastName: step1.lastName,
+      gender: step1.gender || undefined,
     },
     mode: 'onTouched',
   })
@@ -82,7 +83,7 @@ export default function Step1Personal() {
         <select
           id="gender"
           className={`form-select ${errors.gender ? 'is-invalid' : ''}`}
-          defaultValue={state.step1.gender}
+          defaultValue={step1.gender}
           {...register('gender')}
         >
           <option value="">— выберите —</option>

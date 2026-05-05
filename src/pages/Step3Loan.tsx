@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useFormState } from '../context/FormContext'
+import { useFormStore } from '../store/formStore'
 import { step3Schema, type Step3Form } from '../schemas/step3'
 import { addProduct } from '../api/products'
 import SuccessModal from '../components/SuccessModal'
@@ -10,7 +10,10 @@ import { useAutoSave } from '../hooks/useAutoSave'
 
 export default function Step3Loan() {
   const navigate = useNavigate()
-  const { state, setStep3, reset } = useFormState()
+  const step1 = useFormStore((s) => s.step1)
+  const step3 = useFormStore((s) => s.step3)
+  const setStep3 = useFormStore((s) => s.setStep3)
+  const reset = useFormStore((s) => s.reset)
 
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
@@ -18,7 +21,7 @@ export default function Step3Loan() {
 
   const { register, handleSubmit, watch } = useForm<Step3Form>({
     resolver: zodResolver(step3Schema),
-    defaultValues: state.step3,
+    defaultValues: step3,
   })
 
   useAutoSave(watch, (v) => setStep3(v))
@@ -31,7 +34,7 @@ export default function Step3Loan() {
     setSubmitting(true)
     setSubmitError(null)
     try {
-      const { firstName, lastName } = state.step1
+      const { firstName, lastName } = step1
       await addProduct(`${firstName} ${lastName}`)
       setDone({ amount: data.amount, term: data.term })
     } catch (err) {
@@ -111,8 +114,8 @@ export default function Step3Loan() {
 
       {done && (
         <SuccessModal
-          firstName={state.step1.firstName}
-          lastName={state.step1.lastName}
+          firstName={step1.firstName}
+          lastName={step1.lastName}
           amount={done.amount}
           term={done.term}
           onClose={closeModal}

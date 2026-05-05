@@ -6,7 +6,6 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import 'react-international-phone/style.css'
 import './index.css'
 import App from './App'
-import { FormProvider } from './context/FormContext'
 
 // Категории на dummyjson не меняются — кэшируем без перепроверок
 // и без рефетча при фокусе окна.
@@ -25,9 +24,7 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <FormProvider>
-          <App />
-        </FormProvider>
+        <App />
       </BrowserRouter>
     </QueryClientProvider>
   </StrictMode>,

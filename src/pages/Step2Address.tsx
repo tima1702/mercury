@@ -2,14 +2,15 @@ import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery } from '@tanstack/react-query'
-import { useFormState } from '../context/FormContext'
+import { useFormStore } from '../store/formStore'
 import { step2Schema, type Step2Form } from '../schemas/step2'
 import { getCategories } from '../api/products'
 import { useAutoSave } from '../hooks/useAutoSave'
 
 export default function Step2Address() {
   const navigate = useNavigate()
-  const { state, setStep2 } = useFormState()
+  const step2 = useFormStore((s) => s.step2)
+  const setStep2 = useFormStore((s) => s.setStep2)
 
   const { data: categories, error: loadError } = useQuery({
     queryKey: ['categories'],
@@ -23,7 +24,7 @@ export default function Step2Address() {
     formState: { errors },
   } = useForm<Step2Form>({
     resolver: zodResolver(step2Schema),
-    defaultValues: state.step2,
+    defaultValues: step2,
     mode: 'onTouched',
   })
 
@@ -43,7 +44,7 @@ export default function Step2Address() {
         <select
           id="workplace"
           className={`form-select ${errors.workplace ? 'is-invalid' : ''}`}
-          defaultValue={state.step2.workplace}
+          defaultValue={step2.workplace}
           disabled={!categories}
           {...register('workplace')}
         >

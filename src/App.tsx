@@ -2,7 +2,7 @@ import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import Step1Personal from './pages/Step1Personal'
 import Step2Address from './pages/Step2Address'
 import Step3Loan from './pages/Step3Loan'
-import { useFormState } from './context/FormContext'
+import { useFormStore } from './store/formStore'
 import { step1Schema } from './schemas/step1'
 import { step2Schema } from './schemas/step2'
 
@@ -23,9 +23,10 @@ function StepBar() {
 }
 
 export default function App() {
-  const { state } = useFormState()
-  const step1Ok = step1Schema.safeParse(state.step1).success
-  const step2Ok = step1Ok && step2Schema.safeParse(state.step2).success
+  const step1 = useFormStore((s) => s.step1)
+  const step2 = useFormStore((s) => s.step2)
+  const step1Ok = step1Schema.safeParse(step1).success
+  const step2Ok = step1Ok && step2Schema.safeParse(step2).success
 
   return (
     <div className="app-shell">
