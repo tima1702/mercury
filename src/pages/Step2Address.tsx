@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQuery } from '@tanstack/react-query'
 import { useFormState } from '../context/FormContext'
 import { step2Schema, type Step2Form } from '../schemas/step2'
 import { getCategories } from '../api/products'
@@ -11,8 +11,10 @@ export default function Step2Address() {
   const navigate = useNavigate()
   const { state, setStep2 } = useFormState()
 
-  const [categories, setCategories] = useState<string[] | null>(null)
-  const [loadError, setLoadError] = useState<string | null>(null)
+  const { data: categories, error: loadError } = useQuery({
+    queryKey: ['categories'],
+    queryFn: getCategories,
+  })
 
   const {
     register,
@@ -26,20 +28,6 @@ export default function Step2Address() {
   })
 
   useAutoSave(watch, (v) => setStep2(v))
-
-  useEffect(() => {
-    let cancelled = false
-    getCategories()
-      .then((list) => {
-        if (!cancelled) setCategories(list)
-      })
-      .catch((err: Error) => {
-        if (!cancelled) setLoadError(err.message)
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [])
 
   const onSubmit = handleSubmit((data) => {
     setStep2(data)
@@ -60,7 +48,11 @@ export default function Step2Address() {
           {...register('workplace')}
         >
           <option value="">
-            {loadError ? `Ошибка загрузки: ${loadError}` : !categories ? 'Загрузка…' : '— выберите —'}
+            {loadError
+              ? `Ошибка загрузки: ${loadError.message}`
+              : !categories
+                ? 'Загрузка…'
+                : '— выберите —'}
           </option>
           {categories?.map((c) => (
             <option key={c} value={c}>{c}</option>
