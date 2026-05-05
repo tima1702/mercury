@@ -6,9 +6,9 @@ import { PhoneInput as IntlPhoneInput } from 'react-international-phone'
 
 // Определяем страну по локали браузера: navigator.language даёт что-то
 // вроде "ru-RU", "en-US"; Intl.Locale умеет вытащить регион. Если в локали
-// нет региона ("ru" без RU) — пробуем navigator.languages, затем фоллбэк ua.
+// нет региона ("ru" без RU) — пробуем navigator.languages, затем фоллбэк us.
 function detectCountry(): string {
-  if (typeof navigator === 'undefined') return 'ua'
+  if (typeof navigator === 'undefined') return 'us'
   const langs = [navigator.language, ...(navigator.languages ?? [])]
   for (const lang of langs) {
     try {
