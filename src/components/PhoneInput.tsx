@@ -1,38 +1,25 @@
-import { forwardRef } from 'react'
-import { IMaskInput } from 'react-imask'
+import { PhoneInput as IntlPhoneInput } from 'react-international-phone'
 
-// react-imask: маска 0XXX XXX XXX из ТЗ. Ручной regex плохо переживает
-// вставку из буфера и редактирование курсором в середине строки.
+// react-international-phone: селектор страны + автоматическая маска
+// под формат конкретной страны. Лёгкая (без libphonenumber-js),
+// маски и флаги встроены.
 
 type Props = {
   value: string
   onChange: (value: string) => void
-  onBlur?: () => void
   invalid?: boolean
   id?: string
 }
 
-const PhoneInput = forwardRef<HTMLInputElement, Props>(function PhoneInput(
-  { value, onChange, onBlur, invalid, id },
-  ref,
-) {
+export default function PhoneInput({ value, onChange, invalid, id }: Props) {
   return (
-    <IMaskInput
-      mask="0000 000 000"
-      definitions={{ '0': /[0-9]/ }}
-      lazy={false}
-      placeholderChar="X"
-      overwrite="shift"
-      inputRef={ref as never}
-      id={id}
-      type="tel"
-      inputMode="numeric"
-      className={`form-control ${invalid ? 'is-invalid' : ''}`}
+    <IntlPhoneInput
+      defaultCountry="ua"
       value={value}
-      onAccept={(v: string) => onChange(v)}
-      onBlur={onBlur}
+      onChange={onChange}
+      inputProps={{ id }}
+      inputClassName={`form-control ${invalid ? 'is-invalid' : ''}`}
+      className="phone-input"
     />
   )
-})
-
-export default PhoneInput
+}

@@ -44,7 +44,6 @@ export default function Step1Personal() {
               id="phone"
               value={field.value}
               onChange={field.onChange}
-              onBlur={field.onBlur}
               invalid={!!errors.phone}
             />
           )}
