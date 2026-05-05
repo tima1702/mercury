@@ -46,3 +46,24 @@ body {
 .react-international-phone-country-selector-button:hover {
   background-color: var(--react-international-phone-background-color, #fff);
 }
+
+// Фокус-ринг на всю группу (флаг + поле), а не только на input.
+// Bootstrap по умолчанию подсвечивает только .form-control, из-за чего
+// рамка обрывается на стыке с селектором страны.
+.phone-input {
+  border-radius: 0.375rem;
+  transition: box-shadow 0.15s ease-in-out;
+
+  .react-international-phone-input {
+    box-shadow: none;
+
+    &:focus {
+      box-shadow: none;
+      border-color: $grey-200;
+    }
+  }
+
+  &:focus-within {
+    box-shadow: 0 0 0 0.25rem rgba($primary, 0.25);
+  }
+}
