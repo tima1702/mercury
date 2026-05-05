@@ -1,9 +1,10 @@
 import { useNavigate } from 'react-router-dom'
 import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useFormState } from '../context/FormContext'
+import { useFormState, type Step1Data } from '../context/FormContext'
 import { step1Schema, type Step1Form } from '../schemas/step1'
 import PhoneInput from '../components/PhoneInput'
+import { useAutoSave } from '../hooks/useAutoSave'
 
 export default function Step1Personal() {
   const navigate = useNavigate()
@@ -13,6 +14,7 @@ export default function Step1Personal() {
     register,
     control,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<Step1Form>({
     resolver: zodResolver(step1Schema),
@@ -24,6 +26,8 @@ export default function Step1Personal() {
     },
     mode: 'onTouched',
   })
+
+  useAutoSave(watch, (v) => setStep1(v as Step1Data))
 
   const onSubmit = handleSubmit((data) => {
     setStep1(data)

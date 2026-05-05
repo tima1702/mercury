@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useFormState } from '../context/FormContext'
 import { step2Schema, type Step2Form } from '../schemas/step2'
 import { getCategories } from '../api/products'
+import { useAutoSave } from '../hooks/useAutoSave'
 
 export default function Step2Address() {
   const navigate = useNavigate()
@@ -16,12 +17,15 @@ export default function Step2Address() {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<Step2Form>({
     resolver: zodResolver(step2Schema),
     defaultValues: state.step2,
     mode: 'onTouched',
   })
+
+  useAutoSave(watch, (v) => setStep2(v))
 
   useEffect(() => {
     let cancelled = false

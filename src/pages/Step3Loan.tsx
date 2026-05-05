@@ -6,6 +6,7 @@ import { useFormState } from '../context/FormContext'
 import { step3Schema, type Step3Form } from '../schemas/step3'
 import { addProduct } from '../api/products'
 import SuccessModal from '../components/SuccessModal'
+import { useAutoSave } from '../hooks/useAutoSave'
 
 export default function Step3Loan() {
   const navigate = useNavigate()
@@ -19,6 +20,8 @@ export default function Step3Loan() {
     resolver: zodResolver(step3Schema),
     defaultValues: state.step3,
   })
+
+  useAutoSave(watch, (v) => setStep3(v))
 
   const amount = watch('amount')
   const term = watch('term')
