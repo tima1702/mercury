@@ -6,23 +6,16 @@ SPA из трёх шагов: личные данные → адрес и мес
 
 ## Стек
 
-- **Vite + React 19 + TypeScript**
-- **react-router-dom** — переключение между шагами (требование ТЗ).
-- **Zustand** — общий стор формы (`src/store/formStore.ts`). Данные
-  всех трёх шагов доступны на любом шаге, после успешной отправки —
-  `reset()` к начальному состоянию.
-- **react-hook-form + zod + @hookform/resolvers** — валидация форм,
-  типизированные схемы (`src/schemas/`). Каждый шаг автосохраняется
-  в стор с дебаунсом 300 мс (`src/hooks/useAutoSave.ts`), чтобы
-  «Назад» возвращал введённые данные даже без клика «Далее».
-- **TanStack Query + axios** — `useQuery` для `GET /products/category-list`
-  с кешированием результата (`staleTime: Infinity`), повторных запросов
-  не делается.
-- **react-international-phone** — поле телефона с селектором страны и
-  автоматической маской по формату страны. По умолчанию страна определяется
-  из `navigator.language` через `Intl.Locale.region`, фоллбэк — `us`.
-- **Sass** — стили в `src/styles/index.scss`, переменные + nesting.
-- **Bootstrap** (только CSS) — базовая стилизация форм и модалки.
+- **Vite + React 19 + TypeScript** — strict-режим компилятора, билд через `tsc -b && vite build`, прод-чанки см. ниже в «Перформансе».
+- **react-router-dom v7** — роутинг по шагам (`/`, `/step2`, `/step3`); прямой переход на `/step2` или `/step3` без валидных данных предыдущих шагов перехватывает `StepGuard` (`src/App.tsx`) и редиректит на `/`.
+- **Zustand** (`src/store/formStore.ts`) — один стор на всю форму с тремя слайсами (`step1`/`step2`/`step3`), сеттерами и `reset()`. Селекторами подписываюсь точечно (`useFormStore((s) => s.step1)`), чтобы не дёргать ререндер всей страницы при изменении соседних шагов.
+- **react-hook-form + zod + @hookform/resolvers** — `useForm` с `zodResolver`, схемы в `src/schemas/` (`step1.ts`, `step2.ts`, `step3.ts`), типы выводятся через `z.infer`. На step1 и step2 `mode: 'onTouched'`; submit идёт только при валидной схеме.
+- **useAutoSave** (`src/hooks/useAutoSave.ts`) — кастомный хук поверх `watch()` из RHF: подписка на изменения формы + `setTimeout` 300 мс → запись в Zustand-сеттер. Возвращение «Назад» сохраняет ввод даже без клика «Далее».
+- **TanStack Query + axios** — `useQuery({ queryKey: ['categories'] })` в `WorkplaceSelect` (`src/components/WorkplaceSelect.tsx`); рендер по `query.status` (`pending`/`error`/`success`) ранними возвратами. Глобально `staleTime: Infinity`, `gcTime: Infinity`, `refetchOnWindowFocus: false` (`src/main.tsx`) — категории на dummyjson не меняются, повторных запросов нет.
+- **react-international-phone** — без libphonenumber-js, маски и флаги встроены. `defaultCountry` определяется по `navigator.language` / `navigator.languages` через `new Intl.Locale(...).region` (`src/components/PhoneInput.tsx`), фоллбэк — `us`. Валидация телефона на zod-уровне: E.164 regex `^\+\d{8,15}$`.
+- **Sass** — `src/styles/index.scss`, переменные + nesting; фокус-ринг группы `.phone-input` через `:focus-within`, чтобы рамка не обрывалась на стыке селектора страны и инпута.
+- **Bootstrap 5** — только CSS-бандл, без JS. Используется для form-control/form-select/grid и разметки модалки.
+- **Vitest + @testing-library/react + jsdom** — юнит-тесты на схемы, стор и `SuccessModal` (`src/**/__tests__/`).
 
 ## Перформанс
 
