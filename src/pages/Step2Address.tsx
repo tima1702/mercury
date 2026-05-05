@@ -1,21 +1,15 @@
 import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useQuery } from '@tanstack/react-query'
 import { useFormStore } from '../store/formStore'
 import { step2Schema, type Step2Form } from '../schemas/step2'
-import { getCategories } from '../api/products'
 import { useAutoSave } from '../hooks/useAutoSave'
+import WorkplaceSelect from '../components/WorkplaceSelect'
 
 export default function Step2Address() {
   const navigate = useNavigate()
   const step2 = useFormStore((s) => s.step2)
   const setStep2 = useFormStore((s) => s.setStep2)
-
-  const { data: categories, error: loadError } = useQuery({
-    queryKey: ['categories'],
-    queryFn: getCategories,
-  })
 
   const {
     register,
@@ -41,25 +35,12 @@ export default function Step2Address() {
 
       <div className="mb-3">
         <label htmlFor="workplace" className="form-label">Место работы</label>
-        <select
-          id="workplace"
-          className={`form-select ${errors.workplace ? 'is-invalid' : ''}`}
+        <WorkplaceSelect
           defaultValue={step2.workplace}
-          disabled={!categories}
-          {...register('workplace')}
-        >
-          <option value="">
-            {loadError
-              ? `Ошибка загрузки: ${loadError.message}`
-              : !categories
-                ? 'Загрузка…'
-                : '— выберите —'}
-          </option>
-          {categories?.map((c) => (
-            <option key={c} value={c}>{c}</option>
-          ))}
-        </select>
-        {errors.workplace && <div className="invalid-feedback">{errors.workplace.message}</div>}
+          invalid={!!errors.workplace}
+          registration={register('workplace')}
+        />
+        {errors.workplace && <div className="invalid-feedback d-block">{errors.workplace.message}</div>}
       </div>
 
       <div className="mb-4">
