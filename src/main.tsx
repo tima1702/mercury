@@ -4,7 +4,7 @@ import { BrowserRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'react-international-phone/style.css'
-import './index.css'
+import './styles/index.scss'
 import App from './App'
 
 // Категории на dummyjson не меняются — кэшируем без перепроверок
