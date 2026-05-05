@@ -18,10 +18,11 @@ function detectCountry(): string {
       // некорректный тег — пропускаем
     }
   }
-  return 'ua'
+  return 'us'
 }
 
 const defaultCountry = detectCountry()
+const preferredCountries = ['us', 'ua', 'ru']
 
 type Props = {
   value: string
@@ -34,6 +35,7 @@ export default function PhoneInput({ value, onChange, invalid, id }: Props) {
   return (
     <IntlPhoneInput
       defaultCountry={defaultCountry}
+      preferredCountries={preferredCountries}
       value={value}
       onChange={onChange}
       inputProps={{ id }}

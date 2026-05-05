@@ -30,3 +30,8 @@ body {
   font-weight: 500;
   color: #0d6efd;
 }
+
+/* Убираем подсветку при наведении на селектор страны — мешает */
+.react-international-phone-country-selector-button:hover {
+  background-color: var(--react-international-phone-background-color, #fff);
+}
