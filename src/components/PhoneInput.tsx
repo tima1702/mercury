@@ -22,7 +22,6 @@ function detectCountry(): string {
 }
 
 const defaultCountry = detectCountry()
-const preferredCountries = ['us', 'ua', 'ru']
 
 type Props = {
   value: string
@@ -35,7 +34,6 @@ export default function PhoneInput({ value, onChange, invalid, id }: Props) {
   return (
     <IntlPhoneInput
       defaultCountry={defaultCountry}
-      preferredCountries={preferredCountries}
       value={value}
       onChange={onChange}
       inputProps={{ id }}
